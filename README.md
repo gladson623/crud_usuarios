@@ -29,9 +29,12 @@ Abra [http://localhost:3000](http://localhost:3000). Se essa porta estiver ocupa
 - Validação e máscaras para CPF, telefone, CEP e data de nascimento.
 - Rotas de API para consultar e alterar os usuários.
 - Senhas protegidas com hash antes de serem armazenadas.
+- Login com token de acesso em cookie HttpOnly e logout.
+- Rotas internas protegidas; o primeiro cadastro é permitido apenas para criar o usuário inicial.
 
 O CRUD utiliza as rotas `GET` e `POST` em `/api/usuarios`, e `PUT` e `DELETE` em `/api/usuarios/[id]`.
 
+O login usa `POST /api/auth/login` e o logout usa `POST /api/auth/logout`. A sessão é um token assinado armazenado em um cookie HttpOnly, válido por sete dias.
 
 ## Persistência dos dados
 

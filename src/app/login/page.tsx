@@ -1,14 +1,34 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import type { FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 
 export default function LoginPage() {
   const router = useRouter();
+  const [erro, setErro] = useState("");
+  const [carregando, setCarregando] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    router.push("/dashboard");
+    setErro("");
+    setCarregando(true);
+    const dados = new FormData(event.currentTarget);
+    try {
+      const resposta = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: dados.get("email"), senha: dados.get("password") }),
+      });
+      if (!resposta.ok) {
+        const retorno = await resposta.json() as { erro?: string };
+        throw new Error(retorno.erro || "Não foi possível entrar.");
+      }
+      router.replace("/dashboard");
+    } catch (falha) {
+      setErro(falha instanceof Error ? falha.message : "Não foi possível entrar.");
+    } finally {
+      setCarregando(false);
+    }
   }
 
   return (
@@ -50,7 +70,8 @@ export default function LoginPage() {
               required
             />
           </label>
-          <button className="primary-button" type="submit">Entrar no painel</button>
+          {erro && <p className="form-error" role="alert">{erro}</p>}
+          <button className="primary-button" type="submit" disabled={carregando}>{carregando ? "Entrando..." : "Entrar no painel"}</button>
         </form>
       </section>
     </main>

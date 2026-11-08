@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { exigirAutenticacao } from "../../../lib/auth";
 import { criarHashSenha, lerUsuarios, salvarUsuarios, usuarioPublico, validarCpf, type UsuarioEntrada } from "../../../lib/usuarios";
 
 export const runtime = "nodejs";
@@ -11,13 +12,21 @@ function entradaValida(body: Partial<UsuarioEntrada>) {
     && /^\d{4}-\d{2}-\d{2}$/.test(body.dataNascimento ?? "");
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const usuarios = await lerUsuarios();
+  if (usuarios.length > 0) {
+    const erro = await exigirAutenticacao(request);
+    if (erro) return erro;
+  }
   return Response.json(usuarios.map(usuarioPublico));
 }
 
 export async function POST(request: Request) {
   const usuariosExistentes = await lerUsuarios();
+  if (usuariosExistentes.length > 0) {
+    const erro = await exigirAutenticacao(request);
+    if (erro) return erro;
+  }
   let body: Partial<UsuarioEntrada>;
   try {
     body = await request.json() as Partial<UsuarioEntrada>;

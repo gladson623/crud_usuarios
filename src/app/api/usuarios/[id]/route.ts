@@ -1,8 +1,11 @@
 import { criarHashSenha, lerUsuarios, salvarUsuarios, usuarioPublico, validarCpf, type UsuarioEntrada } from "../../../../lib/usuarios";
+import { exigirAutenticacao } from "../../../../lib/auth";
 
 export const runtime = "nodejs";
 
 export async function PUT(request: Request, context: RouteContext<"/api/usuarios/[id]">) {
+  const erroAutenticacao = await exigirAutenticacao(request);
+  if (erroAutenticacao) return erroAutenticacao;
   const { id } = await context.params;
   let body: Partial<UsuarioEntrada>;
   try {
@@ -39,6 +42,8 @@ export async function PUT(request: Request, context: RouteContext<"/api/usuarios
 }
 
 export async function DELETE(_request: Request, context: RouteContext<"/api/usuarios/[id]">) {
+  const erroAutenticacao = await exigirAutenticacao(_request);
+  if (erroAutenticacao) return erroAutenticacao;
   const { id } = await context.params;
   const usuarios = await lerUsuarios();
   const restantes = usuarios.filter((usuario) => usuario.id !== id);

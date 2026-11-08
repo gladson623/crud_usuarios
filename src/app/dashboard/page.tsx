@@ -14,7 +14,9 @@ export default function DashboardPage() {
           <Link href="/produtos">Produtos</Link>
           <Link href="/usuarios">Usuários</Link>
         </nav>
-        <Link className="logout-link" href="/login">Sair da conta</Link>
+        <form className="logout-form" action="/api/auth/logout" method="post">
+          <button className="logout-link" type="submit">Sair da conta</button>
+        </form>
       </aside>
 
       <main className="main-area">
